@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import datetime
+import time
 from pathlib import Path
 
 def create_error_file(error_message):
