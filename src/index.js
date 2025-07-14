@@ -19,10 +19,7 @@ const errorLogger = winston.createLogger({
   ),
   transports: [
     new winston.transports.File({
-      filename: (error) => {
-        const timestamp = moment().format('YYYY-MM-DD-HH-mm-ss');
-        return `./logs/error-${timestamp}.txt`;
-      },
+      filename: `./logs/error-${moment().format('YYYY-MM-DD-HH-mm-ss')}.txt`,
       level: 'error',
       handleExceptions: true
     })
