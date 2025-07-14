@@ -45,13 +45,22 @@ cp .env.example .env
 
 ## Usage
 
-### Development
-```bash
-npm run dev
-```
+### Running the Server
 
-### Production
+You can run the server in two ways:
+
+1. Using Python script (Recommended for error logging):
 ```bash
+python main.py
+```
+This method provides automatic error file creation in the `logs` directory.
+
+2. Using npm directly:
+```bash
+# Development mode
+npm run dev
+
+# Production mode
 npm start
 ```
 
