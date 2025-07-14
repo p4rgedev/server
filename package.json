@@ -13,7 +13,10 @@
     "winston": "^3.11.0",
     "moment": "^2.29.4",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.2",
+    "express-session": "^1.17.3",
+    "dearpygui": "^1.9.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",

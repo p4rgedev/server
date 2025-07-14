@@ -1,16 +1,18 @@
 # Arch Linux Server
 
-A Node.js server implementation with automated error logging system for Arch Linux desktop PC.
+A Node.js server for Arch Linux desktop PC with automated error logging, GitHub authentication, and a GUI interface.
 
 ## Features
 
-- Express.js server setup
-- Automated error logging system with timestamp-based file creation
-- CORS enabled
-- Environment variable configuration
-- Comprehensive error handling
+- Automated error logging with timestamp-based filenames
+- Secure GitHub authentication (single authorized user)
+- IP banning for unauthorized access attempts
+- GUI interface for server management
 - Public network access via <ip>:4000
 - Configurable port (default: 4000)
+- Real-time error tracking and logging
+- Environment-based configuration
+- Cross-platform compatibility
 
 ## Error Logging System
 
@@ -35,12 +37,24 @@ cd server
 2. Install dependencies:
 ```bash
 npm install
+python -m pip install dearpygui requests
 ```
 
-3. Create environment file:
+3. Set up GitHub OAuth:
+   - Go to GitHub Developer Settings
+   - Create a new OAuth App
+   - Set the callback URL to `http://localhost:4000/oauth-callback`
+   - Copy the Client ID and Client Secret
+
+4. Create environment file:
 ```bash
 cp .env.example .env
-# Edit .env with your configuration
+# Add GitHub Client ID, Client Secret, username and session secret
+```
+
+5. Launch the GUI:
+```bash
+python src/gui.py
 ```
 
 ## Usage
