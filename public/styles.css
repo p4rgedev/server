@@ -1,0 +1,153 @@
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-bolditalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-demibold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-demibolditalic.otf') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-mediumitalic.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-lightitalic.otf') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-extralight.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-extralightitalic.otf') format('opentype');
+  font-weight: 200;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-extrabold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'p4rgefont';
+  src: url('/fonts/p4rgefont-extrabolditalic.otf') format('opentype');
+  font-weight: 800;
+  font-style: italic;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'p4rgefont', sans-serif;
+  background: linear-gradient(120deg, #2d0036 0%, #4b006e 50%, #1a0026 100%);
+  background-attachment: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-container {
+  background: rgba(30, 0, 40, 0.85);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(31, 0, 50, 0.37);
+  padding: 40px 32px;
+  max-width: 350px;
+  width: 100%;
+  color: #fff;
+  text-align: center;
+}
+
+.login-container h2 {
+  margin-bottom: 24px;
+  font-size: 2rem;
+  font-family: 'p4rgefont', sans-serif;
+  font-weight: 700;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 8px;
+  background: #3a0057;
+  color: #fff;
+  font-size: 1rem;
+  font-family: 'p4rgefont', sans-serif;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 12px;
+  background: #7c2ae8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s;
+  font-family: 'p4rgefont', sans-serif;
+  font-weight: 600;
+}
+
+.login-container button:hover {
+  background: #a259f7;
+}
+
+strong, b {
+  font-weight: 700;
+}
+
+em, i {
+  font-style: italic;
+} 

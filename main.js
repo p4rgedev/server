@@ -6,8 +6,10 @@ const path = require('path');
 const app = express();
 const PORT = 80;
 const BAN_FILE = path.join(__dirname, 'ban.json');
+const APPROVED_FILE = path.join(__dirname, 'approved.json');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
 
 // Helper to load bans
 function loadBans() {
@@ -24,6 +26,19 @@ function saveBans(bans) {
   fs.writeFileSync(BAN_FILE, JSON.stringify(bans, null, 2));
 }
 
+function loadApproved() {
+  if (!fs.existsSync(APPROVED_FILE)) return [];
+  try {
+    return JSON.parse(fs.readFileSync(APPROVED_FILE, 'utf8'));
+  } catch {
+    return [];
+  }
+}
+
+function saveApproved(approved) {
+  fs.writeFileSync(APPROVED_FILE, JSON.stringify(approved, null, 2));
+}
+
 // In-memory store for failed attempts (reset on server restart)
 const failedAttempts = {};
 
@@ -38,24 +53,32 @@ app.use((req, res, next) => {
   next();
 });
 
-// Simple landing page
+// Simple landing page with improved visuals
 app.get('/', (req, res) => {
   res.send(`
-    <html>
-      <head><title>Login</title></head>
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Login</title>
+        <link rel="stylesheet" href="/styles.css" />
+      </head>
       <body>
-        <h2>Login Page</h2>
-        <form method="POST" action="/login">
-          <input type="text" name="username" placeholder="Username" required /><br/>
-          <input type="password" name="password" placeholder="Password" required /><br/>
-          <button type="submit">Login</button>
-        </form>
+        <div class="login-container">
+          <h2>Login Page</h2>
+          <form method="POST" action="/login">
+            <input type="text" name="username" placeholder="Username" required autocomplete="username" />
+            <input type="password" name="password" placeholder="Password" required autocomplete="current-password" />
+            <button type="submit">Login</button>
+          </form>
+        </div>
       </body>
     </html>
   `);
 });
 
-// Placeholder for login logic
+// Login logic
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
   const ip = req.ip;
@@ -70,7 +93,33 @@ app.post('/login', (req, res) => {
   if (username === 'p4rge' && password === 'ctrl_z_000') {
     // Success: reset failed attempts
     failedAttempts[ip] = 0;
-    return res.send('<h2>Login successful! Welcome to p4rge-locals.</h2>');
+    // Add to approved.json if not already present
+    let approved = loadApproved();
+    if (!approved.find(a => a.ip === ip)) {
+      approved.push({
+        ip,
+        time: new Date().toISOString(),
+        userAgent: req.headers['user-agent'] || '',
+      });
+      saveApproved(approved);
+    }
+    return res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>Login Success</title>
+          <link rel="stylesheet" href="/styles.css" />
+        </head>
+        <body>
+          <div class="login-container">
+            <h2>Login successful! <span style="font-weight:400;">Welcome to <b>p4rge-locals</b>.</span></h2>
+            <a href="/">Back to Login</a>
+          </div>
+        </body>
+      </html>
+    `);
   } else {
     // Failure: increment failed attempts
     failedAttempts[ip] = (failedAttempts[ip] || 0) + 1;
@@ -85,7 +134,23 @@ app.post('/login', (req, res) => {
       saveBans(bans);
       return res.redirect('https://www.google.com');
     }
-    return res.send(`<h2>Login failed! Attempt ${failedAttempts[ip]} of 3.</h2><a href="/">Try again</a>`);
+    return res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>Login Failed</title>
+          <link rel="stylesheet" href="/styles.css" />
+        </head>
+        <body>
+          <div class="login-container">
+            <h2>Login failed! Attempt ${failedAttempts[ip]} of 3.</h2>
+            <a href="/">Try again</a>
+          </div>
+        </body>
+      </html>
+    `);
   }
 });
 
