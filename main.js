@@ -70,7 +70,7 @@ app.post('/login', (req, res) => {
   if (username === 'p4rge' && password === 'ctrl_z_000') {
     // Success: reset failed attempts
     failedAttempts[ip] = 0;
-    return res.send('<h2>Login successful!</h2>');
+    return res.send('<h2>Login successful! Welcome to p4rge-locals.</h2>');
   } else {
     // Failure: increment failed attempts
     failedAttempts[ip] = (failedAttempts[ip] || 0) + 1;
