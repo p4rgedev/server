@@ -4,12 +4,14 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
+const { spawn, exec } = require('child_process');
 
 const app = express();
 const PORT = 80;
 const BAN_FILE = path.join(__dirname, 'ban.json');
 const APPROVED_FILE = path.join(__dirname, 'approved.json');
 const NOTES_FILE = path.join(__dirname, 'notes.json');
+const TODO_FILE = path.join(__dirname, 'todo.json');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
@@ -54,8 +56,37 @@ function saveNotes(notes) {
   fs.writeFileSync(NOTES_FILE, JSON.stringify(notes, null, 2));
 }
 
+function loadTodos() {
+  if (!fs.existsSync(TODO_FILE)) return [];
+  try {
+    return JSON.parse(fs.readFileSync(TODO_FILE, 'utf8'));
+  } catch {
+    return [];
+  }
+}
+function saveTodos(todos) {
+  fs.writeFileSync(TODO_FILE, JSON.stringify(todos, null, 2));
+}
+
 // In-memory store for failed attempts (reset on server restart)
 const failedAttempts = {};
+
+// Example subsystem definitions (can be extended)
+const SUBSYSTEMS = [
+  {
+    id: 'minecraft',
+    name: 'Minecraft Server',
+    command: 'java',
+    args: ['-Xmx1024M', '-Xms1024M', '-jar', 'server.jar', 'nogui'],
+    cwd: path.join(__dirname, 'minecraft-server'),
+    process: null
+  }
+  // Add more subsystems here
+];
+
+function getSubsystemById(id) {
+  return SUBSYSTEMS.find(s => s.id === id);
+}
 
 // Middleware to check ban by IP
 app.use((req, res, next) => {
@@ -87,6 +118,7 @@ function navBar(active) {
       <a href="/notes"${active==='notes'?' class="active"':''}>Notes</a>
       <a href="/todo"${active==='todo'?' class="active"':''}>To-Do</a>
       <a href="/settings"${active==='settings'?' class="active"':''}>Settings</a>
+      <a href="/subsystems"${active==='subsystems'?' class="active"':''}>Subsystems</a>
       <a href="/">Logout</a>
     </nav>
   `;
@@ -333,8 +365,9 @@ app.post('/notes/delete/:id', requireAuth, (req, res) => {
   res.redirect('/notes');
 });
 
-// To-Do page (placeholder)
+// To-Do page (with add, toggle, delete)
 app.get('/todo', requireAuth, (req, res) => {
+  const todos = loadTodos();
   res.send(`
     <!DOCTYPE html>
     <html lang="en">
@@ -347,12 +380,55 @@ app.get('/todo', requireAuth, (req, res) => {
       <body>
         ${navBar('todo')}
         <div class="dashboard-container">
-          <h2>To-Do</h2>
-          <p>To-Do list coming soon.</p>
+          <h2>To-Do List</h2>
+          <form method="POST" action="/todo/add" style="margin-bottom:2rem;">
+            <input type="text" name="task" placeholder="New to-do..." required style="width:70%;border-radius:8px;padding:8px;" />
+            <button type="submit">Add</button>
+          </form>
+          <ul style="list-style:none;padding:0;">
+            ${todos.map((todo, i) => `
+              <li style="background:rgba(44,0,66,0.2);margin-bottom:1rem;padding:1rem;border-radius:8px;display:flex;align-items:center;">
+                <form method="POST" action="/todo/toggle/${i}" style="display:inline;margin-right:1rem;">
+                  <button type="submit" style="background:none;border:none;cursor:pointer;">${todo.done ? '✅' : '⬜'}</button>
+                </form>
+                <span style="flex:1;text-decoration:${todo.done ? 'line-through' : 'none'};color:${todo.done ? '#aaa' : '#fff'};">${todo.task}</span>
+                <form method="POST" action="/todo/delete/${i}" style="display:inline;margin-left:1rem;">
+                  <button type="submit" onclick="return confirm('Delete this to-do?')">Delete</button>
+                </form>
+              </li>
+            `).join('')}
+          </ul>
         </div>
       </body>
     </html>
   `);
+});
+
+app.post('/todo/add', requireAuth, express.urlencoded({ extended: false }), (req, res) => {
+  const todos = loadTodos();
+  todos.push({ task: req.body.task, done: false });
+  saveTodos(todos);
+  res.redirect('/todo');
+});
+
+app.post('/todo/toggle/:id', requireAuth, (req, res) => {
+  const todos = loadTodos();
+  const id = parseInt(req.params.id);
+  if (todos[id]) {
+    todos[id].done = !todos[id].done;
+    saveTodos(todos);
+  }
+  res.redirect('/todo');
+});
+
+app.post('/todo/delete/:id', requireAuth, (req, res) => {
+  const todos = loadTodos();
+  const id = parseInt(req.params.id);
+  if (todos[id]) {
+    todos.splice(id, 1);
+    saveTodos(todos);
+  }
+  res.redirect('/todo');
 });
 
 // Settings page (placeholder)
@@ -375,6 +451,60 @@ app.get('/settings', requireAuth, (req, res) => {
       </body>
     </html>
   `);
+});
+
+// Subsystem management page
+app.get('/subsystems', requireAuth, (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Subsystems</title>
+        <link rel="stylesheet" href="/styles.css" />
+      </head>
+      <body>
+        ${navBar('subsystems')}
+        <div class="dashboard-container">
+          <h2>Subsystem Management</h2>
+          <ul style="list-style:none;padding:0;">
+            ${SUBSYSTEMS.map(s => `
+              <li style="background:rgba(44,0,66,0.2);margin-bottom:1rem;padding:1rem;border-radius:8px;">
+                <b>${s.name}</b> <span style="color:${s.process ? '#0f0' : '#f00'};font-weight:600;">${s.process ? 'Running' : 'Stopped'}</span>
+                <form method="POST" action="/subsystems/${s.id}/start" style="display:inline;margin-left:1rem;">
+                  <button type="submit" ${s.process ? 'disabled' : ''}>Start</button>
+                </form>
+                <form method="POST" action="/subsystems/${s.id}/stop" style="display:inline;margin-left:1rem;">
+                  <button type="submit" ${!s.process ? 'disabled' : ''}>Stop</button>
+                </form>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      </body>
+    </html>
+  `);
+});
+
+app.post('/subsystems/:id/start', requireAuth, (req, res) => {
+  const subsystem = getSubsystemById(req.params.id);
+  if (subsystem && !subsystem.process) {
+    subsystem.process = spawn(subsystem.command, subsystem.args, { cwd: subsystem.cwd, detached: true, stdio: 'ignore' });
+    subsystem.process.unref();
+  }
+  res.redirect('/subsystems');
+});
+
+app.post('/subsystems/:id/stop', requireAuth, (req, res) => {
+  const subsystem = getSubsystemById(req.params.id);
+  if (subsystem && subsystem.process) {
+    try {
+      process.kill(-subsystem.process.pid);
+    } catch {}
+    subsystem.process = null;
+  }
+  res.redirect('/subsystems');
 });
 
 app.listen(PORT, () => {
