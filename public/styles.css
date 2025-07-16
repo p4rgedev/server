@@ -150,4 +150,38 @@ strong, b {
 
 em, i {
   font-style: italic;
+}
+
+.navbar {
+  display: flex;
+  gap: 1.5rem;
+  background: rgba(44, 0, 66, 0.95);
+  padding: 1rem 2rem;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 2px 8px 0 rgba(31, 0, 50, 0.15);
+  margin-bottom: 2rem;
+  font-family: 'p4rgefont', sans-serif;
+}
+.navbar a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+.navbar a.active, .navbar a:hover {
+  background: #7c2ae8;
+  color: #fff;
+}
+.dashboard-container {
+  background: rgba(30, 0, 40, 0.85);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(31, 0, 50, 0.37);
+  padding: 40px 32px;
+  max-width: 600px;
+  width: 100%;
+  color: #fff;
+  text-align: center;
+  margin: 0 auto;
 } 
