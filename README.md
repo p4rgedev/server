@@ -37,7 +37,6 @@ cd server
 2. Install dependencies:
 ```bash
 npm install
-python -m pip install dearpygui requests
 ```
 
 3. Set up GitHub OAuth:
