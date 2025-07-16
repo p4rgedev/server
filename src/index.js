@@ -41,7 +41,7 @@ const connections = []; // Array of { ip, time, path }
 const verifiedIPs = new Map(); // key: ip, value: { login, loginTime, lastPath }
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 80;
 
 // Middleware
 app.use(cors());
@@ -251,11 +251,11 @@ function getServerIP() {
   return '127.0.0.1'; // Fallback to localhost
 }
 
-app.listen(port, '0.0.0.0', () => {
-  const serverIP = getServerIP();
+app.listen(port, '127.0.0.1', () => {
+  const serverIP = '127.0.0.1';
   console.log('Server running on:');
   console.log(`- Local: http://localhost:${port}`);
-  console.log(`- Network: http://${serverIP}:${port}`);
+  console.log(`- Localhost: http://${serverIP}:${port}`);
 });
 
 // Handle uncaught exceptions

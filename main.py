@@ -7,7 +7,7 @@ from pathlib import Path
 import requests
 import platform
 
-SERVER_URL = 'http://localhost:4000'  # Adjust if needed
+SERVER_URL = 'http://localhost:80'  # Adjust if needed
 REFRESH_INTERVAL = 0.5  # seconds
 
 def create_error_file(error_message):
@@ -53,8 +53,8 @@ def dashboard():
             print('Could not fetch server stats. Is the server running?')
             time.sleep(REFRESH_INTERVAL)
             continue
-        server_ip = stats.get('ip', 'unknown')
-        server_port = stats.get('port', 'unknown')
+        server_ip = 'localhost'
+        server_port = 80
         print('==== Server Dashboard ====' )
         print(f"Server URL: http://{server_ip}:{server_port}/")
         print(f"Server Time: {stats.get('serverTime')}")
