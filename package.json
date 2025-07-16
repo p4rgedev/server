@@ -1,24 +1,12 @@
 {
-  "name": "arch-linux-server",
+  "name": "auth-ban-server",
   "version": "1.0.0",
-  "description": "Server for Arch Linux desktop PC with error logging",
-  "main": "src/index.js",
+  "main": "main.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "test": "jest"
+    "start": "node main.js"
   },
   "dependencies": {
-    "axios": "^1.10.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "express-session": "^1.17.3",
-    "moment": "^2.29.4",
-    "winston": "^3.11.0"
-  },
-  "devDependencies": {
-    "jest": "^29.7.0",
-    "nodemon": "^3.0.1"
+    "body-parser": "^1.20.2"
   }
-}
+} 
