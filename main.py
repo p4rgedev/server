@@ -8,7 +8,7 @@ import requests
 import platform
 
 SERVER_URL = 'http://localhost:4000'  # Adjust if needed
-REFRESH_INTERVAL = 2  # seconds
+REFRESH_INTERVAL = 0.5  # seconds
 
 def create_error_file(error_message):
     # Create logs directory if it doesn't exist
@@ -53,10 +53,13 @@ def dashboard():
             print('Could not fetch server stats. Is the server running?')
             time.sleep(REFRESH_INTERVAL)
             continue
+        server_ip = stats.get('ip', 'unknown')
+        server_port = stats.get('port', 'unknown')
         print('==== Server Dashboard ====' )
+        print(f"Server URL: http://{server_ip}:{server_port}/")
         print(f"Server Time: {stats.get('serverTime')}")
         print(f"Uptime: {format_uptime(stats.get('uptime', 0))}")
-        print(f"IP:Port: {stats.get('ip')}:{stats.get('port')}")
+        print(f"IP:Port: {server_ip}:{server_port}")
         print()
         print(f"Connected Users: {len(stats.get('connectedUsers', []))}")
         for user in stats.get('connectedUsers', []):
@@ -64,7 +67,11 @@ def dashboard():
         print()
         print(f"Connections (last 100): {len(stats.get('connections', []))}")
         for conn in stats.get('connections', [])[-5:]:
-            print(f"  - IP: {conn['ip']} | Time: {conn['time']} | Path: {conn['path']}")
+            ip = conn['ip']
+            if ip == '127.0.0.0':
+                print(f"  - IP: {ip} (invalid) | Time: {conn['time']} | Path: {conn['path']}")
+            else:
+                print(f"  - IP: {ip} | Time: {conn['time']} | Path: {conn['path']}")
         print()
         print(f"Banned IPs: {', '.join(stats.get('bannedIPs', [])) or 'None'}")
         print()
@@ -78,7 +85,7 @@ def dashboard():
         print(f"  CPU Cores: {len(stats['deviceUsage']['cpus'])}")
         if stats['deviceUsage']['load']:
             print(f"  Load Avg: {', '.join(str(x) for x in stats['deviceUsage']['load'])}")
-        print('\n(Refreshing every', REFRESH_INTERVAL, 'seconds. Press Ctrl+C to exit.)')
+        print(f'\n(Refreshing every {REFRESH_INTERVAL} seconds. Press Ctrl+C to exit.)')
         time.sleep(REFRESH_INTERVAL)
 
 def run_server():

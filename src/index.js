@@ -143,11 +143,12 @@ app.get('/stats', (req, res) => {
   const memoryUsage = process.memoryUsage();
   const cpus = os.cpus();
   const load = os.loadavg ? os.loadavg() : [];
+  const serverIP = getServerIP();
 
   res.json({
     uptime,
     serverTime: new Date(),
-    ip: req.hostname,
+    ip: serverIP,
     port,
     connectedUsers: Array.from(connectedUsers.values()),
     connections: connections.slice(-100),
@@ -176,7 +177,7 @@ app.get('/status', (req, res) => {
 
   res.json({
     status: 'online',
-    ip: ips[0] || 'unknown',
+    ip: ips[0] || getServerIP() || 'unknown',
     port: port
   });
 });
