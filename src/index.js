@@ -146,7 +146,7 @@ app.get('/test-error', (req, res, next) => {
 });
 
 // Start server
-const os = require('os');
+// const os = require('os'); // <-- Remove this duplicate line
 
 // Get server's IP address
 function getServerIP() {
